@@ -407,7 +407,7 @@ debug_solution_3 = np.asarray([
 # these tests will also raise AssertionErrors if check_solution doesn't
 # create the same solution array as passed
 
-test_check_solution(debug_solution_1)
+# test_check_solution(debug_solution_1)
 # test_check_solution(debug_solution_2)
 # test_check_solution(debug_solution_3)
 
@@ -472,19 +472,18 @@ sudoku_2 = [
         (3, 1, 2),
 ]
 
-# TODO: create the clamped unit list
-# for clamping units, the sampler class expects a list contain the neuron
-# indices which are clamped to 1
 
-clamp_1 = [...]
-clamp_2 = [...]
+sudoku_1 = np.array(sudoku_1)
+sudoku_2 = np.array(sudoku_2)
+
+clamp_1 = [sudoku_1[:, 0]*D**2 + sudoku_1[:, 1]*D + sudoku_1[:, 2] - 1][0]
+clamp_2 = [sudoku_2[:, 0]*D**2 + sudoku_2[:, 1]*D + sudoku_2[:, 2] - 1][0]
 
 # run main
 
-main(clamp_1, title='a')
-#main(clamp_2, title='b')
-#main(clamp_2, title='c', bias=4, w_inh=-6)
+# main(clamp_1, title='a')
+# main(clamp_2, title='b')
+main(clamp_2, title='c', bias=4, w_inh=-6)  # 4, -6
 
-# TODO end
 
 plt.show()  # avoid having multiple plt.show()s in your code
