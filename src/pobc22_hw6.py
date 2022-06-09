@@ -159,22 +159,62 @@ def check_solution(z, D=D):
     assert z.ndim == 1
     assert z.shape == (D**3,)
 
-    # TODO: implement this
-    #
-    # You can use the function unit_index_to_grid_pos if you want, which also
-    # defines the conversion between neuron index and sudoku grid.
-    #
-    # The solution array should be a (D, D)-shaped array. Every element of this
-    # array should be:
-    #
-    # * The chosen digit (1 ... D) if only one neuron encoding this field is
-    #   active.
-    # * 0 if no neuron was active.
-    # * -1 if multiple neurons were active.
+    mapping = np.asarray([unit_index_to_grid_pos(ind, D) for ind in range(len(z))])
+    solution_array = np.zeros((D, D))
+    is_valid = True
 
-    ...
+    for unit_id, field_id, row_id, col_id, block_id, digit in mapping:
 
-    # TODO end
+        # another digit is chosen in this field
+        digit_indices = []
+        for i in range(unit_id - digit, unit_id + D - digit):
+            digit_indices.append(z[i])
+
+        sum_digit = sum(digit_indices)
+
+        if sum_digit != 1:
+            is_valid = False
+
+        if sum_digit > 1:
+            solution_array[row_id, col_id] = -1
+        elif sum_digit == 0:
+            solution_array[row_id, col_id] = 0
+        else:
+            solution_array[row_id, col_id] = np.argwhere(digit_indices) + 1
+
+        # the same digit is chosen elsewhere within this row
+        sum_digit = 0
+        row_offset = row_id * D ** 2
+        row_starting_point = unit_id - field_id * D
+        for i in range(row_starting_point + row_offset, row_starting_point + D ** 2 + row_offset, D):
+            sum_digit += z[i]
+
+        if sum_digit != 1:
+            is_valid = False
+
+        # the same digit is chosen elsewhere within this column
+        sum_digit = 0
+        column_starting_point = unit_id - row_id * D**2
+        for i in range(column_starting_point, column_starting_point + D**3, D**2):
+            sum_digit += z[i]
+
+        if sum_digit != 1:
+            is_valid = False
+
+        # the same digit is chosen elsewhere within this block
+        sum_digit = 0
+        sqrt_D = int(sqrt(D))
+        col_start = col_id - col_id % sqrt_D
+        row_start = row_id - row_id % sqrt_D
+
+        for col in range(col_start, col_start + sqrt_D):
+            for row in range(row_start, row_start + sqrt_D):
+                i = digit + row * D ** 2 + col * D
+
+                sum_digit += z[i]
+
+        if sum_digit != 1:
+            is_valid = False
 
     return is_valid, solution_array
 
@@ -367,7 +407,7 @@ debug_solution_3 = np.asarray([
 # these tests will also raise AssertionErrors if check_solution doesn't
 # create the same solution array as passed
 
-# test_check_solution(debug_solution_1)
+test_check_solution(debug_solution_1)
 # test_check_solution(debug_solution_2)
 # test_check_solution(debug_solution_3)
 
@@ -410,7 +450,7 @@ def main(clamp, title, **kwargs):
 
     # plot results
 
-    # plot_results(states, fn=join(outdir, f'{title}_results.png'))
+    plot_results(states, fn=join(outdir, f'{title}_results.png'))
 
 
 # ----------------------------------------------------------------------
