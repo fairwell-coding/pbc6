@@ -483,7 +483,7 @@ clamp_2 = [sudoku_2[:, 0]*D**2 + sudoku_2[:, 1]*D + sudoku_2[:, 2] - 1][0]
 
 # main(clamp_1, title='a')
 # main(clamp_2, title='b')
-main(clamp_2, title='c', bias=4, w_inh=-6)  # 4, -6
+main(clamp_2, title='c', bias=4, w_inh=-6)
 
 
 plt.show()  # avoid having multiple plt.show()s in your code
